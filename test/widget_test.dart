@@ -1,30 +1,39 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:kernel_panic_app/main.dart';
+import 'package:kernel_panic_app/core/theme/app_theme.dart';
+import 'package:kernel_panic_app/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:kernel_panic_app/features/splash/presentation/screens/splash_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('splash renders the brand wordmark', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: const SplashScreen(duration: Duration(days: 1)),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1200));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('IT TEAM'), findsOneWidget);
+    expect(find.byType(SplashScreen), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Disposing the tree cancels the splash navigation timer.
+    await tester.pumpWidget(const SizedBox());
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('onboarding starts on the first slide', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(theme: AppTheme.light, home: const OnboardingScreen()),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('التالي'), findsOneWidget);
+    expect(find.textContaining('كورسات ومسارات تعلم'), findsOneWidget);
+    expect(find.byType(OnboardingScreen), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox());
   });
 }
